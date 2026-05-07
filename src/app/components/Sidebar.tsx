@@ -228,24 +228,6 @@ export function Sidebar({ onClose }: { onClose?: () => void }) {
           <Search size={14} strokeWidth={2.5} />
           Cari Leads
         </button>
-
-        {/* Secondary: Buat Campaign Baru (navy dark) */}
-        <button
-          onClick={() => navigate("/campaigns")}
-          className="w-full flex items-center justify-center gap-2 py-2.5 transition-all"
-          style={{
-            background: "#0F1F3D",
-            color: "#FFFFFF",
-            borderRadius: "8px",
-            fontSize: "13px",
-            fontWeight: 600,
-          }}
-          onMouseEnter={(e) => ((e.currentTarget as HTMLElement).style.background = "#1E3A5F")}
-          onMouseLeave={(e) => ((e.currentTarget as HTMLElement).style.background = "#0F1F3D")}
-        >
-          <Plus size={14} strokeWidth={2.5} />
-          Buat Campaign Baru
-        </button>
       </div>
 
       {/* ── Nav Menu ──────────────────────────────────────────────────────── */}

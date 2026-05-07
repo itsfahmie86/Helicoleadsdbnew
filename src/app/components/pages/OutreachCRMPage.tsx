@@ -10,7 +10,6 @@ import {
   Clock,
   ArrowUpRight,
   ChevronRight,
-  Plus,
   Play,
   Pause,
   CheckCircle2,
@@ -160,7 +159,7 @@ export function OutreachCRMPage() {
   return (
     <div className="min-h-screen p-5 md:p-6 lg:p-8" style={{ background: "#F8FAFC", color: "#0F1F3D" }}>
 
-      {/* ── Header ─────────────────────────────────────────────────────���──── */}
+      {/* ── Header ───────────────────────────────────────────────────────── */}
       <div className="flex items-start justify-between mb-6">
         <div>
           <div className="flex items-center gap-3 mb-1.5">
@@ -178,23 +177,6 @@ export function OutreachCRMPage() {
             Kelola komunikasi dan tindak lanjut leads Anda di satu tempat
           </p>
         </div>
-
-        <button
-          className="flex items-center gap-2 px-4 py-2.5 transition-all flex-shrink-0"
-          style={{
-            background: "#0F1F3D",
-            color: "#FFFFFF",
-            borderRadius: "8px",
-            fontSize: "13px",
-            fontWeight: 600,
-          }}
-          onMouseEnter={(e) => ((e.currentTarget as HTMLElement).style.background = "#1a2f52")}
-          onMouseLeave={(e) => ((e.currentTarget as HTMLElement).style.background = "#0F1F3D")}
-        >
-          <Plus size={14} />
-          <span className="hidden sm:inline">Buat Campaign Baru</span>
-          <span className="sm:hidden">Baru</span>
-        </button>
       </div>
 
       {/* ── KPI Cards ─────────────────────────────────────────────────────── */}
@@ -488,23 +470,6 @@ export function OutreachCRMPage() {
                   <p style={{ color: "#94A3B8", fontSize: "12px", marginTop: "2px" }}>Kelola campaign aktif Anda</p>
                 </div>
               </div>
-              <button
-                className="flex items-center gap-1.5 px-2.5 py-1.5 transition-all"
-                style={{
-                  background: "#0F1F3D",
-                  color: "#FFFFFF",
-                  borderRadius: "6px",
-                  fontSize: "11px",
-                  fontWeight: 600,
-                  border: "none",
-                  cursor: "pointer",
-                }}
-                onMouseEnter={(e) => ((e.currentTarget as HTMLElement).style.background = "#1a2f52")}
-                onMouseLeave={(e) => ((e.currentTarget as HTMLElement).style.background = "#0F1F3D")}
-              >
-                <Plus size={11} />
-                Baru
-              </button>
             </div>
 
             {/* Tabs */}
