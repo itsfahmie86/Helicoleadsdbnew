@@ -4,6 +4,7 @@ import { DashboardPage } from "./components/pages/DashboardPage";
 import { NewSearchPage } from "./components/pages/NewSearchPage";
 import { DatabaseLeadsPage } from "./components/pages/DatabaseLeadsPage";
 import { AIIntelligencePage } from "./components/pages/AIIntelligencePage";
+import { CampaignsPage }      from "./components/pages/CampaignsPage";
 import { OutreachCRMPage } from "./components/pages/OutreachCRMPage";
 import { MarketInsightsPage } from "./components/pages/MarketInsightsPage";
 import { AnalyticsROIPage } from "./components/pages/AnalyticsROIPage";
@@ -29,6 +30,7 @@ export const router = createBrowserRouter([
       { path: "new-search",      Component: NewSearchPage      },
       { path: "database-leads",  Component: DatabaseLeadsPage  },
       { path: "ai-intelligence", Component: AIIntelligencePage },
+      { path: "campaigns",       Component: CampaignsPage       },
       { path: "outreach-crm",    Component: OutreachCRMPage    },
       { path: "market-insights", Component: MarketInsightsPage },
       { path: "analytics",       Component: AnalyticsROIPage   },
