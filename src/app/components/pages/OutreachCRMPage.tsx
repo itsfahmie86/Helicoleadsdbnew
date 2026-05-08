@@ -331,7 +331,7 @@ export function OutreachCRMPage() {
                     <button
                       onClick={() => cycleStatus(item.id)}
                       title="Klik untuk ubah status"
-                      className="flex items-center gap-1 px-2 py-1 transition-all w-fit"
+                      className="hidden"
                       style={{
                         background: sc.bg,
                         color: sc.color,
@@ -383,7 +383,7 @@ export function OutreachCRMPage() {
 
                   {/* Mobile card */}
                   <div
-                    className="md:hidden px-4 py-3 flex items-center gap-3"
+                    className="hidden"
                     style={{ borderBottom: index < google_place_leads.length - 1 ? "1px solid #F1F5F9" : "none" }}
                   >
                     <div
