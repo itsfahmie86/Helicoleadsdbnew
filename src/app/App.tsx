@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { RouterProvider } from "react-router";
-import { router } from "../routes";
-import { supabase } from "../lib/supabase";
+import { router } from "./routes";
+import { supabase } from "./lib/supabase";
 
 export default function App() {
   useEffect(() => {
