@@ -11,6 +11,7 @@ import { AnalyticsROIPage } from "./components/pages/AnalyticsROIPage";
 import { PricingPage } from "./components/pages/PricingPage";
 import { SettingsPage } from "./components/pages/SettingsPage";
 import { ErrorsDemoPage } from "./components/pages/ErrorsDemoPage";
+import { AuthCallbackPage } from "./components/pages/AuthCallbackPage";
 
 // ─── Error Pages ─────────────────────────────────────────────────────────────
 import { Error404Page }      from "./components/errors/Error404Page";
@@ -19,6 +20,11 @@ import { Error403Page }      from "./components/errors/Error403Page";
 import { Error500Page }      from "./components/errors/Error500Page";
 
 export const router = createBrowserRouter([
+  // ════════════════════════════════════════════════════════════════════════════
+  //  AUTH CALLBACK — no AuthGuard
+  // ════════════════════════════════════════════════════════════════════════════
+  { path: "/auth/callback", Component: AuthCallbackPage },
+
   // ════════════════════════════════════════════════════════════════════════════
   //  MAIN APP — dengan sidebar Layout
   // ════════════════════════════════════════════════════════════════════════════

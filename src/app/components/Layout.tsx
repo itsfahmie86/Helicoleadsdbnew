@@ -2,16 +2,15 @@ import { useState } from "react";
 import { Outlet } from "react-router";
 import { Sidebar } from "./Sidebar";
 import { Menu } from "lucide-react";
+import { AuthGuard } from "../../lib/AuthGuard";
 
 export function Layout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
-    /**
-     * Outer shell: h-screen + overflow-hidden
-     * This creates the bounded viewport box. Everything inside is constrained to this.
-     */
-    <div className="flex h-screen overflow-hidden" style={{ background: "#F8FAFC" }}>
+    <AuthGuard>
+      {/* Outer shell: h-screen + overflow-hidden. This creates the bounded viewport box. Everything inside is constrained to this. */}
+      <div className="flex h-screen overflow-hidden" style={{ background: "#F8FAFC" }}>
 
       {/* ── DESKTOP sidebar — plain flex child, h-full, never scrolls ── */}
       <div className="hidden lg:flex flex-shrink-0" style={{ height: "100%" }}>
@@ -106,6 +105,7 @@ export function Layout() {
           <Outlet />
         </main>
       </div>
-    </div>
+      </div>
+    </AuthGuard>
   );
 }
