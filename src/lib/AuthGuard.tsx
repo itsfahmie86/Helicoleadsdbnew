@@ -11,34 +11,50 @@ export function AuthGuard({ children }: AuthGuardProps) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // If Supabase is not configured, skip auth check (development mode)
     if (!isSupabaseConfigured) {
-      console.warn('⚠️ Supabase not configured. Running in development mode without authentication.');
+      console.warn('Supabase not configured. Running in development mode.');
       setLoading(false);
       setSession({ user: { id: 'dev-user' } } as Session);
       return;
     }
 
-    // Check active session on mount
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setLoading(false);
-    }).catch((error) => {
-      console.error('Auth session error:', error);
-      setLoading(false);
-    });
+    async function initAuth() {
+      // Step 1: Cek apakah ada token di URL params
+      const params = new URLSearchParams(window.location.search);
+      const accessToken = params.get('access_token');
+      const refreshToken = params.get('refresh_token');
 
-    // Listen for auth changes
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (accessToken && refreshToken) {
+        // Set session dari token URL
+        const { data, error } = await supabase.auth.setSession({
+          access_token: accessToken,
+          refresh_token: refreshToken
+        });
+
+        if (!error && data.session) {
+          // Hapus token dari URL
+          window.history.replaceState({}, '', '/');
+          setSession(data.session);
+          setLoading(false);
+          return;
+        }
+      }
+
+      // Step 2: Cek session yang sudah ada
+      const { data: { session } } = await supabase.auth.getSession();
       setSession(session);
-    });
+      setLoading(false);
+    }
+
+    initAuth();
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (_event, session) => { setSession(session); }
+    );
 
     return () => subscription.unsubscribe();
   }, []);
 
-  // Show loading state
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-white">
@@ -50,12 +66,10 @@ export function AuthGuard({ children }: AuthGuardProps) {
     );
   }
 
-  // Redirect to auth if no session (only in production with Supabase configured)
   if (!session && isSupabaseConfigured) {
     window.location.href = 'https://auth.helicoleads.com';
     return null;
   }
 
-  // Render children if authenticated (or in dev mode)
   return <>{children}</>;
 }
