@@ -268,7 +268,7 @@ export function OutreachCRMPage() {
                 background: "#FAFBFC",
               }}
             >
-              {["#", "", "Bisnis", "Score", "Status", "Aksi"].map((h) => (
+              {["#", "", "Bisnis", "Score", "Aksi"].map((h) => (
                 <span key={h} style={{ color: "#94A3B8", fontSize: "11px", fontWeight: 600, letterSpacing: "0.3px" }}>
                   {h}
                 </span>
