@@ -78,16 +78,18 @@ interface QueueLead {
   colorBg: string;
   status: LeadStatus;
   potential: string;
+  phone?: string;
+  draft_message?: string;
 }
 
-const initialQueue: QueueLead[] = [
-  { id: 1, name: "Klinik Sehat Utama",    location: "Jakarta Selatan", category: "Kesehatan", score: 92, time: "1 jam lalu",  initials: "KS", color: "#DC2626", colorBg: "#FEF2F2", status: "Belum Dihubungi", potential: "Rp 28jt" },
-  { id: 2, name: "Bengkel Maju Jaya",     location: "Jakarta Timur",   category: "Otomotif",  score: 91, time: "2 jam lalu",  initials: "BM", color: "#4F46E5", colorBg: "#EEF2FF", status: "Sudah WA",        potential: "Rp 15jt" },
-  { id: 3, name: "Laundry Cepat Express", location: "Bekasi",          category: "Laundry",   score: 88, time: "3 jam lalu",  initials: "LC", color: "#0284C7", colorBg: "#E0F2FE", status: "Menunggu Reply",  potential: "Rp 8jt"  },
-  { id: 4, name: "Toko Elektronik Murah", location: "Tangerang",       category: "Retail",    score: 82, time: "4 jam lalu",  initials: "TE", color: "#059669", colorBg: "#ECFDF5", status: "Belum Dihubungi", potential: "Rp 12jt" },
-  { id: 5, name: "Apotek Sehat Selalu",   location: "Bekasi",          category: "Kesehatan", score: 79, time: "5 jam lalu",  initials: "AS", color: "#7C3AED", colorBg: "#F5F3FF", status: "Follow-up",       potential: "Rp 9jt"  },
-  { id: 6, name: "Salon Cantik Bersama",  location: "Depok",           category: "Kecantikan",score: 76, time: "6 jam lalu",  initials: "SC", color: "#D97706", colorBg: "#FFFBEB", status: "Belum Dihubungi", potential: "Rp 7jt"  },
-  { id: 7, name: "Resto Makan Enak",      location: "Bandung",         category: "F&B",       score: 74, time: "8 jam lalu",  initials: "RM", color: "#EA580C", colorBg: "#FFF7ED", status: "Sudah WA",        potential: "Rp 10jt" },
+const google_place_leads: QueueLead[] = [
+  { id: 1, name: "Klinik Sehat Utama",    location: "Jakarta Selatan", category: "Kesehatan",  score: 92, time: "1 jam lalu", initials: "KS", color: "#DC2626", colorBg: "#FEF2F2", status: "Belum Dihubungi", potential: "Rp 28jt" },
+  { id: 2, name: "Bengkel Maju Jaya",     location: "Jakarta Timur",   category: "Otomotif",   score: 91, time: "2 jam lalu", initials: "BM", color: "#4F46E5", colorBg: "#EEF2FF", status: "Sudah WA",        potential: "Rp 15jt" },
+  { id: 3, name: "Laundry Cepat Express", location: "Bekasi",          category: "Laundry",    score: 88, time: "3 jam lalu", initials: "LC", color: "#0284C7", colorBg: "#E0F2FE", status: "Menunggu Reply",  potential: "Rp 8jt"  },
+  { id: 4, name: "Toko Elektronik Murah", location: "Tangerang",       category: "Retail",     score: 82, time: "4 jam lalu", initials: "TE", color: "#059669", colorBg: "#ECFDF5", status: "Belum Dihubungi", potential: "Rp 12jt" },
+  { id: 5, name: "Apotek Sehat Selalu",   location: "Bekasi",          category: "Kesehatan",  score: 79, time: "5 jam lalu", initials: "AS", color: "#7C3AED", colorBg: "#F5F3FF", status: "Follow-up",       potential: "Rp 9jt"  },
+  { id: 6, name: "Salon Cantik Bersama",  location: "Depok",           category: "Kecantikan", score: 76, time: "6 jam lalu", initials: "SC", color: "#D97706", colorBg: "#FFFBEB", status: "Belum Dihubungi", potential: "Rp 7jt"  },
+  { id: 7, name: "Resto Makan Enak",      location: "Bandung",         category: "F&B",        score: 74, time: "8 jam lalu", initials: "RM", color: "#EA580C", colorBg: "#FFF7ED", status: "Sudah WA",        potential: "Rp 10jt" },
 ];
 
 // ─── Campaign Data ────────────────────────────────────────────────────────────
@@ -132,11 +134,10 @@ const statusConfig: Record<LeadStatus, { bg: string; color: string; border: stri
 
 // ─── Component ────────────────────────────────────────────────────────────────
 export function OutreachCRMPage() {
-  // ── ALL hooks must be declared unconditionally at the top ──────────────────
   const [isLoading, setIsLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<CampaignTab>("active");
   const [leadStatuses, setLeadStatuses] = useState<Record<number, LeadStatus>>(
-    Object.fromEntries(initialQueue.map((l) => [l.id, l.status]))
+    Object.fromEntries(google_place_leads.map((l) => [l.id, l.status]))
   );
 
   useEffect(() => {
@@ -144,7 +145,6 @@ export function OutreachCRMPage() {
     return () => clearTimeout(t);
   }, []);
 
-  // ── Early return is safe here — all hooks are already declared above ───────
   if (isLoading) return <OutreachCRMSkeleton />;
 
   const filteredCampaigns = campaigns.filter((c) => c.tab === activeTab);
@@ -154,6 +154,17 @@ export function OutreachCRMPage() {
     const current = leadStatuses[id];
     const next = order[(order.indexOf(current) + 1) % order.length];
     setLeadStatuses((prev) => ({ ...prev, [id]: next }));
+  };
+
+  const handleKirimWA = (item: QueueLead) => {
+    const phone = (item.phone || '').replace(/\D/g, '');
+    const text = encodeURIComponent(item.draft_message || '');
+    if (phone) {
+      window.open(`https://wa.me/${phone}?text=${text}`, '_blank');
+      cycleStatus(item.id);
+    } else {
+      alert(`Nomor telepon ${item.name} tidak tersedia`);
+    }
   };
 
   return (
@@ -211,12 +222,11 @@ export function OutreachCRMPage() {
         ))}
       </div>
 
-      {/* ── Main Layout: stacked on mobile/tablet, side-by-side on xl ───── */}
+      {/* ── Main Layout ───────────────────────────────────────────────────── */}
       <div className="flex flex-col xl:flex-row gap-5">
 
         {/* ── LEFT: Outreach Queue ────────────────────────────────────────── */}
         <div className="flex-1 min-w-0">
-          {/* Section Header */}
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2.5">
               <div className="w-7 h-7 flex items-center justify-center" style={{ background: "#EEF2FF", borderRadius: "8px" }}>
@@ -234,7 +244,7 @@ export function OutreachCRMPage() {
                 className="px-2 py-0.5"
                 style={{ background: "#EEF2FF", color: "#4F46E5", fontSize: "11px", fontWeight: 600, borderRadius: "4px" }}
               >
-                {initialQueue.length} leads
+                {google_place_leads.length} leads
               </span>
               <button
                 className="flex items-center gap-1 transition-opacity hover:opacity-70"
@@ -246,10 +256,9 @@ export function OutreachCRMPage() {
             </div>
           </div>
 
-          {/* Queue — card list (no fixed-width grid, fully responsive) */}
           <div style={{ background: "#FFFFFF", border: "1px solid #E2E8F0", borderRadius: "8px", overflow: "hidden" }}>
 
-            {/* Table header row */}
+            {/* Table header */}
             <div
               className="hidden md:grid px-4 py-2.5"
               style={{
@@ -267,29 +276,27 @@ export function OutreachCRMPage() {
             </div>
 
             {/* Rows */}
-            {initialQueue.map((item, index) => {
+            {google_place_leads.map((item, index) => {
               const currentStatus = leadStatuses[item.id];
               const sc = statusConfig[currentStatus];
               return (
                 <div key={item.id}>
-                  {/* ── Desktop row (md+) ── */}
+                  {/* Desktop row */}
                   <div
                     className="hidden md:grid px-4 py-3 transition-colors"
                     style={{
                       gridTemplateColumns: "28px 40px 1fr 68px 100px 120px",
                       gap: "12px",
                       alignItems: "center",
-                      borderBottom: index < initialQueue.length - 1 ? "1px solid #F1F5F9" : "none",
+                      borderBottom: index < google_place_leads.length - 1 ? "1px solid #F1F5F9" : "none",
                     }}
                     onMouseEnter={(e) => ((e.currentTarget as HTMLElement).style.background = "#FAFBFC")}
                     onMouseLeave={(e) => ((e.currentTarget as HTMLElement).style.background = "transparent")}
                   >
-                    {/* Rank */}
                     <span style={{ color: "#CBD5E1", fontSize: "12px", fontWeight: 600, textAlign: "center" }}>
                       {index + 1}
                     </span>
 
-                    {/* Avatar */}
                     <div
                       className="w-9 h-9 flex items-center justify-center flex-shrink-0"
                       style={{ background: item.colorBg, borderRadius: "8px" }}
@@ -297,7 +304,6 @@ export function OutreachCRMPage() {
                       <span style={{ color: item.color, fontSize: "11px", fontWeight: 700 }}>{item.initials}</span>
                     </div>
 
-                    {/* Name + Meta */}
                     <div className="min-w-0">
                       <p style={{ color: "#0F1F3D", fontSize: "13px", fontWeight: 600, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                         {item.name}
@@ -313,7 +319,6 @@ export function OutreachCRMPage() {
                       </div>
                     </div>
 
-                    {/* Pain Score */}
                     <div className="flex flex-col items-center">
                       <span style={{ color: scoreFill(item.score), fontSize: "16px", fontWeight: 700, lineHeight: 1 }}>
                         {item.score}
@@ -323,7 +328,6 @@ export function OutreachCRMPage() {
                       </div>
                     </div>
 
-                    {/* Status Badge */}
                     <button
                       onClick={() => cycleStatus(item.id)}
                       title="Klik untuk ubah status"
@@ -339,14 +343,14 @@ export function OutreachCRMPage() {
                         cursor: "pointer",
                       }}
                     >
-                      {currentStatus === "Sudah WA"        ? <CheckCircle2 size={10} /> :
-                       currentStatus === "Menunggu Reply"  ? <Clock size={10} /> :
-                       currentStatus === "Follow-up"       ? <ArrowUpRight size={10} /> :
-                                                             <Circle size={10} />}
+                      {currentStatus === "Sudah WA"       ? <CheckCircle2 size={10} /> :
+                       currentStatus === "Menunggu Reply" ? <Clock size={10} /> :
+                       currentStatus === "Follow-up"      ? <ArrowUpRight size={10} /> :
+                                                            <Circle size={10} />}
                       {currentStatus}
                     </button>
 
-                    {/* WA Button */}
+                    {/* WA Button — Desktop */}
                     <button
                       className="flex items-center justify-center gap-1.5 px-3 py-1.5 transition-all"
                       style={{
@@ -360,6 +364,7 @@ export function OutreachCRMPage() {
                         cursor: "pointer",
                         width: "100%",
                       }}
+                      onClick={() => handleKirimWA(item)}
                       onMouseEnter={(e) => {
                         (e.currentTarget as HTMLElement).style.background = "#25D366";
                         (e.currentTarget as HTMLElement).style.color = "#FFFFFF";
@@ -376,12 +381,11 @@ export function OutreachCRMPage() {
                     </button>
                   </div>
 
-                  {/* ── Mobile card (< md) ── */}
+                  {/* Mobile card */}
                   <div
                     className="md:hidden px-4 py-3 flex items-center gap-3"
-                    style={{ borderBottom: index < initialQueue.length - 1 ? "1px solid #F1F5F9" : "none" }}
+                    style={{ borderBottom: index < google_place_leads.length - 1 ? "1px solid #F1F5F9" : "none" }}
                   >
-                    {/* Avatar */}
                     <div
                       className="w-10 h-10 flex items-center justify-center flex-shrink-0"
                       style={{ background: item.colorBg, borderRadius: "8px" }}
@@ -389,7 +393,6 @@ export function OutreachCRMPage() {
                       <span style={{ color: item.color, fontSize: "12px", fontWeight: 700 }}>{item.initials}</span>
                     </div>
 
-                    {/* Info */}
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between gap-2 mb-0.5">
                         <p style={{ color: "#0F1F3D", fontSize: "13px", fontWeight: 600, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
@@ -426,7 +429,7 @@ export function OutreachCRMPage() {
                       </div>
                     </div>
 
-                    {/* WA Button */}
+                    {/* WA Button — Mobile */}
                     <button
                       className="flex items-center justify-center w-9 h-9 flex-shrink-0 transition-all"
                       style={{
@@ -436,6 +439,7 @@ export function OutreachCRMPage() {
                         borderRadius: "8px",
                         cursor: "pointer",
                       }}
+                      onClick={() => handleKirimWA(item)}
                       onMouseEnter={(e) => {
                         (e.currentTarget as HTMLElement).style.background = "#25D366";
                         (e.currentTarget as HTMLElement).style.color = "#FFFFFF";
@@ -457,9 +461,7 @@ export function OutreachCRMPage() {
         {/* ── RIGHT: Campaigns + Quick Stats ──────────────────────────────── */}
         <div className="flex flex-col gap-5 xl:w-[350px] xl:flex-shrink-0">
 
-          {/* Campaign Section */}
           <div style={{ background: "#FFFFFF", border: "1px solid #E2E8F0", borderRadius: "8px", overflow: "hidden" }}>
-            {/* Section Header */}
             <div className="flex items-center justify-between px-5 pt-5 pb-4">
               <div className="flex items-center gap-2.5">
                 <div className="w-7 h-7 flex items-center justify-center" style={{ background: "#F0FDF4", borderRadius: "8px" }}>
@@ -472,7 +474,6 @@ export function OutreachCRMPage() {
               </div>
             </div>
 
-            {/* Tabs */}
             <div className="flex px-5" style={{ borderBottom: "1px solid #F1F5F9" }}>
               {(["active", "draft", "completed"] as CampaignTab[]).map((tab) => {
                 const labels: Record<CampaignTab, string> = { active: "Active", draft: "Draft", completed: "Completed" };
@@ -511,7 +512,6 @@ export function OutreachCRMPage() {
               })}
             </div>
 
-            {/* Campaign List */}
             <div>
               {filteredCampaigns.map((campaign, index) => (
                 <div
@@ -521,7 +521,6 @@ export function OutreachCRMPage() {
                   onMouseEnter={(e) => ((e.currentTarget as HTMLElement).style.background = "#FAFBFC")}
                   onMouseLeave={(e) => ((e.currentTarget as HTMLElement).style.background = "transparent")}
                 >
-                  {/* Campaign Name + Status */}
                   <div className="flex items-start justify-between mb-2">
                     <div className="flex-1 min-w-0 mr-2">
                       <p style={{ color: "#0F1F3D", fontSize: "13px", fontWeight: 600, lineHeight: 1.3 }}>
@@ -538,8 +537,6 @@ export function OutreachCRMPage() {
                         </div>
                       </div>
                     </div>
-
-                    {/* Status Badge */}
                     <span
                       className="flex items-center gap-1 px-2 py-0.5 flex-shrink-0"
                       style={{
@@ -564,7 +561,6 @@ export function OutreachCRMPage() {
                     </span>
                   </div>
 
-                  {/* Progress Bar */}
                   {campaign.tab !== "draft" && (
                     <div className="mb-3">
                       <div className="flex items-center justify-between mb-1">
@@ -592,7 +588,6 @@ export function OutreachCRMPage() {
                     </div>
                   )}
 
-                  {/* Action Buttons */}
                   <div className="flex items-center gap-2">
                     <button
                       className="flex-1 py-1.5 transition-all"
@@ -675,7 +670,7 @@ export function OutreachCRMPage() {
             </div>
           </div>
 
-          {/* ── Quick Stats ───────────────────────────────────────────────── */}
+          {/* Pipeline Status */}
           <div style={{ background: "#FFFFFF", border: "1px solid #E2E8F0", borderRadius: "8px", padding: "20px" }}>
             <div className="flex items-center gap-2 mb-4">
               <div className="w-7 h-7 flex items-center justify-center" style={{ background: "#FEF2F2", borderRadius: "8px" }}>
@@ -687,10 +682,10 @@ export function OutreachCRMPage() {
             <div className="flex flex-col gap-3">
               {(
                 [
-                  { label: "Belum Dihubungi", count: initialQueue.filter((l) => leadStatuses[l.id] === "Belum Dihubungi").length, color: "#64748B", bg: "#F8FAFC", border: "#E2E8F0" },
-                  { label: "Sudah WA",        count: initialQueue.filter((l) => leadStatuses[l.id] === "Sudah WA").length,        color: "#4F46E5", bg: "#EEF2FF", border: "#C7D2FE" },
-                  { label: "Menunggu Reply",  count: initialQueue.filter((l) => leadStatuses[l.id] === "Menunggu Reply").length,  color: "#D97706", bg: "#FFFBEB", border: "#FDE68A" },
-                  { label: "Follow-up",       count: initialQueue.filter((l) => leadStatuses[l.id] === "Follow-up").length,       color: "#DC2626", bg: "#FEF2F2", border: "#FECACA" },
+                  { label: "Belum Dihubungi", count: google_place_leads.filter((l) => leadStatuses[l.id] === "Belum Dihubungi").length, color: "#64748B", bg: "#F8FAFC", border: "#E2E8F0" },
+                  { label: "Sudah WA",        count: google_place_leads.filter((l) => leadStatuses[l.id] === "Sudah WA").length,        color: "#4F46E5", bg: "#EEF2FF", border: "#C7D2FE" },
+                  { label: "Menunggu Reply",  count: google_place_leads.filter((l) => leadStatuses[l.id] === "Menunggu Reply").length,  color: "#D97706", bg: "#FFFBEB", border: "#FDE68A" },
+                  { label: "Follow-up",       count: google_place_leads.filter((l) => leadStatuses[l.id] === "Follow-up").length,       color: "#DC2626", bg: "#FEF2F2", border: "#FECACA" },
                 ] as { label: LeadStatus; count: number; color: string; bg: string; border: string }[]
               ).map((row) => (
                 <div key={row.label} className="flex items-center justify-between">
@@ -706,7 +701,7 @@ export function OutreachCRMPage() {
                     <div style={{ width: "80px", height: "5px", background: "#F1F5F9", borderRadius: "4px", overflow: "hidden" }}>
                       <div
                         style={{
-                          width: `${(row.count / initialQueue.length) * 100}%`,
+                          width: `${(row.count / google_place_leads.length) * 100}%`,
                           height: "100%",
                           background: row.color,
                           borderRadius: "4px",
