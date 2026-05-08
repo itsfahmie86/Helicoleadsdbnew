@@ -17,12 +17,13 @@ import {
   AlertCircle,
 } from "lucide-react";
 import { DashboardSkeleton } from "../Skeletons";
+import { supabase } from "../../../lib/supabase";
 
-// ─── KPI Data ────────────────────────────────────────────────────────────────
-const kpiCards = [
+// ─── KPI Data Template ───────────────────────────────────────────────────────
+const kpiCardsTemplate = [
   {
     label: "Total Leads",
-    value: "1,240",
+    key: "total",
     change: "+12.5%",
     positive: true,
     icon: Users,
@@ -32,7 +33,7 @@ const kpiCards = [
   },
   {
     label: "Hot Leads Hari Ini",
-    value: "24",
+    key: "hot",
     change: "+5%",
     positive: true,
     icon: Flame,
@@ -42,7 +43,7 @@ const kpiCards = [
   },
   {
     label: "Opportunity Value",
-    value: "Rp 115jt",
+    key: "opportunity",
     change: "+8.3%",
     positive: true,
     icon: BadgeDollarSign,
@@ -52,7 +53,7 @@ const kpiCards = [
   },
   {
     label: "Conversion Rate",
-    value: "18.4%",
+    key: "conversion",
     change: "-2.1%",
     positive: false,
     icon: TrendingUp,
@@ -186,11 +187,54 @@ function scoreFill(score: number) {
 export function DashboardPage() {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(true);
+  const [stats, setStats] = useState({
+    total: 0,
+    hot: 0,
+    opportunity: 0,
+  });
 
   useEffect(() => {
-    const t = setTimeout(() => setIsLoading(false), 1200);
-    return () => clearTimeout(t);
+    // Fetch real data from Supabase
+    const fetchStats = async () => {
+      try {
+        // Total leads
+        const { count: totalCount } = await supabase
+          .from('google_place_leads')
+          .select('*', { count: 'exact', head: true });
+
+        // Hot leads (badge = 'hot' or 'priority')
+        const { count: hotCount } = await supabase
+          .from('google_place_leads')
+          .select('*', { count: 'exact', head: true })
+          .in('badge', ['hot', 'priority']);
+
+        setStats({
+          total: totalCount || 0,
+          hot: hotCount || 0,
+          opportunity: totalCount || 0, // placeholder for opportunity count
+        });
+      } catch (error) {
+        console.error('Error fetching stats:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchStats();
   }, []);
+
+  // Build KPI cards with real data
+  const kpiCards = kpiCardsTemplate.map((card) => ({
+    ...card,
+    value:
+      card.key === 'total'
+        ? stats.total.toLocaleString('id-ID')
+        : card.key === 'hot'
+        ? stats.hot.toLocaleString('id-ID')
+        : card.key === 'opportunity'
+        ? `Rp ${Math.floor(stats.opportunity * 10.5)}jt`
+        : '18.4%',
+  }));
 
   if (isLoading) return <DashboardSkeleton />;
 
@@ -229,7 +273,7 @@ export function DashboardPage() {
                 fontWeight: 600,
               }}
             >
-              24 Hot Leads baru
+              {stats.hot} Hot Leads baru
             </span>{" "}
             yang perlu ditindaklanjuti untuk mencapai target kuartal ini.
           </p>

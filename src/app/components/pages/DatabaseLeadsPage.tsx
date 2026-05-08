@@ -28,172 +28,72 @@ import {
 import { LeadAIDetailSheet, type Lead as AILead } from "../LeadAIDetailSheet";
 import { AddToCampaignModal } from "../AddToCampaignModal";
 import { DatabaseLeadsSkeleton } from "../Skeletons";
+import { supabase } from "../../../lib/supabase";
 
-// ─── Mock Data ────────────────────────────────────────────────────────────────
-const ALL_LEADS = [
-  {
-    id: 1,
-    name: "Warung Nasi Bu Imas",
-    location: "Bandung, Jawa Barat",
-    category: "Kuliner",
-    rating: 3.1,
-    reviews: 412,
-    painScore: 91,
-    badge: "hot",
-    painPoints: ["Antrian sangat panjang tanpa sistem", "Sering kehabisan menu favorit"],
-    potential: "Rp 14.200.000",
-    potentialNum: 14200000,
-    lastUpdated: "2 jam lalu",
-    saved: true,
-    initials: "WN",
-    color: "#DC2626",
-    colorBg: "#FEF2F2",
-  },
-  {
-    id: 2,
-    name: "Laundry Cepat Express",
-    location: "Jakarta Selatan",
-    category: "Laundry",
-    rating: 3.3,
-    reviews: 287,
-    painScore: 85,
-    badge: "hot",
-    painPoints: ["Pakaian sering tertukar pelanggan lain", "Tidak ada notifikasi selesai"],
-    potential: "Rp 8.750.000",
-    potentialNum: 8750000,
-    lastUpdated: "5 jam lalu",
-    saved: true,
-    initials: "LC",
-    color: "#EA580C",
-    colorBg: "#FFF7ED",
-  },
-  {
-    id: 3,
-    name: "Klinik Sehat Utama",
-    location: "Jakarta Selatan",
-    category: "Kesehatan",
-    rating: 3.4,
-    reviews: 198,
-    painScore: 88,
-    badge: "hot",
-    painPoints: ["Waktu tunggu rata-rata 2+ jam", "Tidak bisa booking online"],
-    potential: "Rp 32.000.000",
-    potentialNum: 32000000,
-    lastUpdated: "1 hari lalu",
+// ─── Helper: Generate initials ───────────────────────────────────────────────
+function getInitials(name: string) {
+  return name
+    .split(' ')
+    .slice(0, 2)
+    .map((w) => w[0])
+    .join('')
+    .toUpperCase();
+}
+
+// ─── Helper: Generate color based on badge ───────────────────────────────────
+function getBadgeColors(badge: string) {
+  if (badge === 'hot' || badge === 'priority') return { color: '#DC2626', colorBg: '#FEF2F2' };
+  if (badge === 'warm') return { color: '#EA580C', colorBg: '#FFF7ED' };
+  return { color: '#64748B', colorBg: '#F1F5F9' };
+}
+
+// ─── Helper: Format potential ─────────────────────────────────────────────────
+function formatPotential(score: number) {
+  const val = Math.floor(score * 100000);
+  return `Rp ${(val / 1000000).toFixed(1)}jt`;
+}
+
+// ─── Type for Supabase lead ───────────────────────────────────────────────────
+interface SupabaseLead {
+  place_id: string;
+  name: string;
+  city: string;
+  niche: string;
+  rating: number;
+  review_count: number;
+  lead_score: number;
+  badge: string;
+  primary_pain_category: string;
+  has_website: boolean;
+  draft_message: string;
+  insight_card: any;
+}
+
+// ─── Transform Supabase data to app format ───────────────────────────────────
+function transformLead(lead: SupabaseLead, index: number) {
+  const colors = getBadgeColors(lead.badge);
+  return {
+    id: index + 1,
+    name: lead.name || 'Unknown Business',
+    location: lead.city || 'Unknown',
+    category: lead.niche || 'Umum',
+    rating: lead.rating || 0,
+    reviews: lead.review_count || 0,
+    painScore: lead.lead_score || 0,
+    badge: lead.badge === 'priority' ? 'hot' : lead.badge || 'cold',
+    painPoints: [
+      lead.primary_pain_category || 'Belum ada data pain points',
+      !lead.has_website ? 'Tidak memiliki website' : 'Website tersedia',
+    ],
+    potential: formatPotential(lead.lead_score || 0),
+    potentialNum: Math.floor((lead.lead_score || 0) * 100000),
+    lastUpdated: '1 hari lalu',
     saved: false,
-    initials: "KS",
-    color: "#7C3AED",
-    colorBg: "#F5F3FF",
-  },
-  {
-    id: 4,
-    name: "Bengkel Maju Bersama",
-    location: "Depok, Jawa Barat",
-    category: "Otomotif",
-    rating: 3.6,
-    reviews: 154,
-    painScore: 74,
-    badge: "warm",
-    painPoints: ["Estimasi harga tidak transparan", "Tidak ada update status perbaikan"],
-    potential: "Rp 6.400.000",
-    potentialNum: 6400000,
-    lastUpdated: "1 hari lalu",
-    saved: true,
-    initials: "BM",
-    color: "#0284C7",
-    colorBg: "#E0F2FE",
-  },
-  {
-    id: 5,
-    name: "Salon Cantik Permata",
-    location: "Tangerang Selatan",
-    category: "Kecantikan",
-    rating: 3.5,
-    reviews: 321,
-    painScore: 70,
-    badge: "warm",
-    painPoints: ["Jam buka tidak konsisten", "Staff sering tidak available untuk booking"],
-    potential: "Rp 5.100.000",
-    potentialNum: 5100000,
-    lastUpdated: "2 hari lalu",
-    saved: false,
-    initials: "SC",
-    color: "#DB2777",
-    colorBg: "#FDF2F8",
-  },
-  {
-    id: 6,
-    name: "Toko Bangunan Surya",
-    location: "Bekasi, Jawa Barat",
-    category: "Retail",
-    rating: 3.7,
-    reviews: 89,
-    painScore: 67,
-    badge: "warm",
-    painPoints: ["Stok tidak update di toko online", "Tidak ada layanan pengiriman"],
-    potential: "Rp 11.300.000",
-    potentialNum: 11300000,
-    lastUpdated: "3 hari lalu",
-    saved: false,
-    initials: "TB",
-    color: "#059669",
-    colorBg: "#ECFDF5",
-  },
-  {
-    id: 7,
-    name: "Apotek Sehat Selalu",
-    location: "Jakarta Timur",
-    category: "Kesehatan",
-    rating: 3.8,
-    reviews: 203,
-    painScore: 58,
-    badge: "warm",
-    painPoints: ["Sering kehabisan obat umum", "Antrean kasir lambat"],
-    potential: "Rp 7.800.000",
-    potentialNum: 7800000,
-    lastUpdated: "4 hari lalu",
-    saved: true,
-    initials: "AS",
-    color: "#0284C7",
-    colorBg: "#E0F2FE",
-  },
-  {
-    id: 8,
-    name: "Kafe Daun Hijau",
-    location: "Bogor, Jawa Barat",
-    category: "Kuliner",
-    rating: 4.0,
-    reviews: 445,
-    painScore: 42,
-    badge: "cold",
-    painPoints: ["WiFi sering down", "Tidak ada menu digital / QR"],
-    potential: "Rp 3.200.000",
-    potentialNum: 3200000,
-    lastUpdated: "1 minggu lalu",
-    saved: false,
-    initials: "KD",
-    color: "#64748B",
-    colorBg: "#F1F5F9",
-  },
-  {
-    id: 9,
-    name: "Warung Padang Sederhana",
-    location: "Jakarta Pusat",
-    category: "Kuliner",
-    rating: 4.1,
-    reviews: 567,
-    painScore: 35,
-    badge: "cold",
-    painPoints: ["Tidak ada menu online", "Pembayaran hanya tunai"],
-    potential: "Rp 2.500.000",
-    potentialNum: 2500000,
-    lastUpdated: "1 minggu lalu",
-    saved: false,
-    initials: "WP",
-    color: "#64748B",
-    colorBg: "#F1F5F9",
-  },
-];
+    initials: getInitials(lead.name || 'XX'),
+    color: colors.color,
+    colorBg: colors.colorBg,
+  };
+}
 
 // ─── Config ───────────────────────────────────────────────────────────────────
 const badgeConfig = {
@@ -245,9 +145,8 @@ export function DatabaseLeadsPage() {
   const [search, setSearch] = useState("");
   const [badgeFilter, setBadgeFilter] = useState<"all" | "hot" | "warm" | "cold">("all");
   const [activeChips, setActiveChips] = useState<string[]>([]);
-  const [savedIds, setSavedIds] = useState<number[]>(
-    ALL_LEADS.filter((l) => l.saved).map((l) => l.id)
-  );
+  const [allLeads, setAllLeads] = useState<any[]>([]);
+  const [savedIds, setSavedIds] = useState<number[]>([]);
   const [sortKey, setSortKey] = useState<SortKey>("painScore");
   const [sortDir, setSortDir] = useState<SortDir>("desc");
   const [openMenu, setOpenMenu] = useState<number | null>(null);
@@ -266,7 +165,7 @@ export function DatabaseLeadsPage() {
   };
 
   const filtered = useMemo(() => {
-    let data = [...ALL_LEADS];
+    let data = [...allLeads];
     if (search.trim()) {
       const q = search.toLowerCase();
       data = data.filter(
@@ -282,18 +181,44 @@ export function DatabaseLeadsPage() {
       return sortDir === "asc" ? (va as number) - (vb as number) : (vb as number) - (va as number);
     });
     return data;
-  }, [search, badgeFilter, sortKey, sortDir]);
+  }, [allLeads, search, badgeFilter, sortKey, sortDir]);
 
   const counts = {
-    all: ALL_LEADS.length,
-    hot: ALL_LEADS.filter((l) => l.badge === "hot").length,
-    warm: ALL_LEADS.filter((l) => l.badge === "warm").length,
-    cold: ALL_LEADS.filter((l) => l.badge === "cold").length,
+    all: allLeads.length,
+    hot: allLeads.filter((l) => l.badge === "hot").length,
+    warm: allLeads.filter((l) => l.badge === "warm").length,
+    cold: allLeads.filter((l) => l.badge === "cold").length,
   };
 
   useEffect(() => {
-    const t = setTimeout(() => setIsLoading(false), 1200);
-    return () => clearTimeout(t);
+    // Fetch leads from Supabase
+    const fetchLeads = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('google_place_leads')
+          .select(
+            'place_id, name, city, niche, rating, review_count, lead_score, badge, primary_pain_category, has_website, draft_message, insight_card'
+          )
+          .order('lead_score', { ascending: false });
+
+        if (error) {
+          console.error('Error fetching leads:', error);
+          setAllLeads([]);
+        } else {
+          const transformed = (data || []).map((lead: SupabaseLead, idx: number) =>
+            transformLead(lead, idx)
+          );
+          setAllLeads(transformed);
+        }
+      } catch (err) {
+        console.error('Unexpected error fetching leads:', err);
+        setAllLeads([]);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchLeads();
   }, []);
 
   if (isLoading) return <DatabaseLeadsSkeleton />;
@@ -348,7 +273,7 @@ export function DatabaseLeadsPage() {
       {/* ── Stats Strip ────────────────────────────────────────────────── */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
         {[
-          { label: "Total Leads", value: ALL_LEADS.length, icon: Database, accent: "#4F46E5", bg: "#EEF2FF" },
+          { label: "Total Leads", value: allLeads.length, icon: Database, accent: "#4F46E5", bg: "#EEF2FF" },
           { label: "Hot Leads", value: counts.hot, icon: Flame, accent: "#DC2626", bg: "#FEF2F2" },
           { label: "Warm Leads", value: counts.warm, icon: Thermometer, accent: "#D97706", bg: "#FFFBEB" },
           { label: "Cold Leads", value: counts.cold, icon: Snowflake, accent: "#2563EB", bg: "#EFF6FF" },
@@ -501,7 +426,7 @@ export function DatabaseLeadsPage() {
         <p style={{ color: "#94A3B8", fontSize: "12px" }}>
           Menampilkan{" "}
           <span style={{ color: "#0F1F3D", fontWeight: 600 }}>{filtered.length}</span> dari{" "}
-          <span style={{ color: "#0F1F3D", fontWeight: 600 }}>{ALL_LEADS.length}</span> leads
+          <span style={{ color: "#0F1F3D", fontWeight: 600 }}>{allLeads.length}</span> leads
         </p>
         {(badgeFilter !== "all" || search || activeChips.length > 0) && (
           <button
@@ -516,7 +441,37 @@ export function DatabaseLeadsPage() {
       </div>
 
       {/* ── Empty State ────────────────────────────────────────────────── */}
-      {filtered.length === 0 && (
+      {allLeads.length === 0 && (
+        <div
+          className="flex flex-col items-center justify-center py-24"
+          style={{ background: "#FFFFFF", border: "1px solid #E2E8F0", borderRadius: "8px" }}
+        >
+          <div
+            className="w-14 h-14 flex items-center justify-center mb-4"
+            style={{ background: "#F8FAFC", border: "1px solid #E2E8F0", borderRadius: "12px" }}
+          >
+            <Database size={22} style={{ color: "#94A3B8" }} />
+          </div>
+          <p style={{ color: "#0F1F3D", fontSize: "15px", fontWeight: 600, marginBottom: "6px" }}>
+            Belum ada leads
+          </p>
+          <p style={{ color: "#94A3B8", fontSize: "13px", textAlign: "center", maxWidth: "320px" }}>
+            Database Anda masih kosong. Mulai cari leads baru menggunakan AI Search untuk mengisi database.
+          </p>
+          <button
+            onClick={() => navigate("/new-search")}
+            className="flex items-center gap-2 mt-6 px-4 py-2.5 transition-all hover:opacity-80"
+            style={{ background: "#0F1F3D", color: "#FFFFFF", borderRadius: "8px", fontSize: "13px", fontWeight: 600 }}
+          >
+            <Sparkles size={13} />
+            Cari Leads Baru
+            <ArrowRight size={13} />
+          </button>
+        </div>
+      )}
+
+      {/* ── Filtered Empty State ───────────────────────────────────────── */}
+      {allLeads.length > 0 && filtered.length === 0 && (
         <div
           className="flex flex-col items-center justify-center py-24"
           style={{ background: "#FFFFFF", border: "1px solid #E2E8F0", borderRadius: "8px" }}
