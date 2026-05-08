@@ -262,7 +262,7 @@ export function OutreachCRMPage() {
             <div
               className="hidden md:grid px-4 py-2.5"
               style={{
-                gridTemplateColumns: "28px 40px 1fr 68px 100px 120px",
+                gridTemplateColumns: "28px 40px 1fr 68px 120px",
                 gap: "12px",
                 borderBottom: "1px solid #F1F5F9",
                 background: "#FAFBFC",
@@ -285,7 +285,7 @@ export function OutreachCRMPage() {
                   <div
                     className="hidden md:grid px-4 py-3 transition-colors"
                     style={{
-                      gridTemplateColumns: "28px 40px 1fr 68px 100px 120px",
+                      gridTemplateColumns: "28px 40px 1fr 68px 120px",
                       gap: "12px",
                       alignItems: "center",
                       borderBottom: index < google_place_leads.length - 1 ? "1px solid #F1F5F9" : "none",
