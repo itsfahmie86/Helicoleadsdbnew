@@ -43,7 +43,7 @@ export const router = createBrowserRouter([
       { path: "pain-radar",      Component: PainRadarPage       },
       { path: "morning-brief",   Component: MorningBriefPage    },
       { path: "draft-ai",        Component: DraftAIPage         },
-      { path: "outreach-crm",    Component: OutreachCRMPage    },
+      { path: "outreach-crm",    element: <Navigate to="/draft-ai" replace /> },
       { path: "market-insights", Component: MarketInsightsPage },
       { path: "analytics",       Component: AnalyticsROIPage   },
       { path: "pricing",         Component: PricingPage        },
