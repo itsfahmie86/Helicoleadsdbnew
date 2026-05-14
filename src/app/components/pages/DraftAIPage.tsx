@@ -199,7 +199,7 @@ export function DraftAIPage() {
           ) : draft ? (
             <textarea readOnly value={draft}
               style={{
-                flex: 1, minHeight: 300, padding: 14, borderRadius: 8,
+                flex: 1, minHeight: 400, padding: 14, borderRadius: 8,
                 border: "1px solid #E2E8F0", background: "#F8FAFC",
                 fontSize: 14, lineHeight: 1.7, color: "#0F1F3D",
                 resize: "none", fontFamily: "inherit",
