@@ -124,8 +124,9 @@ export function DraftAIPage() {
                     style={{
                       display: "flex", alignItems: "center", gap: 10, padding: "10px 12px",
                       borderRadius: 8, cursor: "pointer", textAlign: "left",
-                      border: selected?.place_id === lead.place_id ? "1.5px solid #CBD5E1" : "1px solid #E2E8F0",
-                      background: selected?.place_id === lead.place_id ? "#FFFFFF" : "#F8FAFC",
+                      border: selected?.place_id === lead.place_id ? "1px solid #E2E8F0" : "1px solid transparent",
+                      background: selected?.place_id === lead.place_id ? "#FFFFFF" : "transparent",
+                      boxShadow: selected?.place_id === lead.place_id ? "0 1px 4px rgba(0,0,0,0.08)" : "none",
                     }}>
                     <div style={{
                       width: 32, height: 32, borderRadius: 8, flexShrink: 0,
