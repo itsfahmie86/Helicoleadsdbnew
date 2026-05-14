@@ -192,6 +192,8 @@ export function DashboardPage() {
     hot: 0,
     opportunity: 0,
   });
+  const [livePainAlerts, setLivePainAlerts] = useState<any[]>([]);
+  const [liveOutreachQueue, setLiveOutreachQueue] = useState<any[]>([]);
 
   useEffect(() => {
     // Fetch real data from Supabase
@@ -211,8 +213,64 @@ export function DashboardPage() {
         setStats({
           total: totalCount || 0,
           hot: hotCount || 0,
-          opportunity: totalCount || 0, // placeholder for opportunity count
+          opportunity: totalCount || 0,
         });
+
+        // Fetch pain alerts — top 3 by lead_score with complaints
+        const { data: painData } = await supabase
+          .from('google_place_leads')
+          .select('place_id,name,city,niche,lead_score,rating,review_count,primary_pain_category,primary_pain_quote,revenue_loss_min,revenue_loss_max,badge')
+          .gte('lead_score', 70)
+          .order('lead_score', { ascending: false })
+          .limit(3);
+
+        if (painData && painData.length > 0) {
+          const colors = ['#7C3AED','#DC2626','#EA580C'];
+          const colorBgs = ['#F5F3FF','#FEF2F2','#FFF7ED'];
+          setLivePainAlerts(painData.map((l, i) => ({
+            id: i + 1,
+            name: l.name || 'Unknown',
+            location: l.city || '-',
+            score: l.lead_score || 0,
+            category: l.niche || '-',
+            painQuote: l.primary_pain_quote ? `"${l.primary_pain_quote}"` : '"Pelanggan melaporkan masalah pada layanan bisnis ini."',
+            potential: l.revenue_loss_min ? `Rp ${Math.round((l.revenue_loss_min)/1000)}rb` : `Rp ${Math.floor((l.lead_score||0) * 150)}rb`,
+            reviewCount: l.review_count || 0,
+            rating: l.rating || 0,
+            initials: (l.name||'XX').split(' ').map((w:string)=>w[0]).join('').substring(0,2).toUpperCase(),
+            color: colors[i] || '#4F46E5',
+            colorBg: colorBgs[i] || '#EEF2FF',
+          })));
+        }
+
+        // Fetch outreach queue — top 5 by lead_score
+        const { data: queueData } = await supabase
+          .from('google_place_leads')
+          .select('place_id,name,city,niche,lead_score,updated_at')
+          .order('lead_score', { ascending: false })
+          .limit(5);
+
+        if (queueData && queueData.length > 0) {
+          const qColors = ['#4F46E5','#7C3AED','#059669','#0284C7','#EA580C'];
+          const qColorBgs = ['#EEF2FF','#F5F3FF','#ECFDF5','#E0F2FE','#FFF7ED'];
+          setLiveOutreachQueue(queueData.map((l, i) => {
+            const updatedAt = l.updated_at ? new Date(l.updated_at) : new Date();
+            const diffH = Math.floor((Date.now() - updatedAt.getTime()) / 3600000);
+            const timeStr = diffH < 1 ? 'Baru saja' : diffH < 24 ? `${diffH} jam lalu` : `${Math.floor(diffH/24)} hari lalu`;
+            return {
+              id: i + 1,
+              name: l.name || 'Unknown',
+              location: l.city || '-',
+              score: l.lead_score || 0,
+              time: timeStr,
+              initials: (l.name||'XX').split(' ').map((w:string)=>w[0]).join('').substring(0,2).toUpperCase(),
+              color: qColors[i] || '#4F46E5',
+              colorBg: qColorBgs[i] || '#EEF2FF',
+              category: l.niche || '-',
+              status: 'Belum dihubungi',
+            };
+          }));
+        }
       } catch (error) {
         console.error('Error fetching stats:', error);
       } finally {
@@ -437,7 +495,7 @@ export function DashboardPage() {
 
         {/* Pain Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {painAlerts.map((alert) => (
+          {(livePainAlerts.length > 0 ? livePainAlerts : painAlerts).map((alert) => (
             <div
               key={alert.id}
               className="flex flex-col p-5"
@@ -666,7 +724,7 @@ export function DashboardPage() {
             overflow: "hidden",
           }}
         >
-          {outreachQueue.map((item, index) => (
+          {(liveOutreachQueue.length > 0 ? liveOutreachQueue : outreachQueue).map((item, index) => (
             <div
               key={item.id}
               className="flex items-center gap-4 px-5 py-4 transition-colors"
