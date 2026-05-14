@@ -35,11 +35,11 @@ const navItems: NavItem[] = [
   { label: "Overview",            icon: LayoutDashboard, path: "/"                },
   { label: "Cari Leads",          icon: Search,          path: "/database-leads"  },
   { label: "My Leads",            icon: Database,        path: "/ai-intelligence" },
-  { label: "Pain Radar",          icon: Activity,        path: "/campaigns",      },
+  { label: "Pain Radar",          icon: Activity,        path: "/pain-radar"         },
   { label: "Market Insight",      icon: TrendingUp,      path: "/market-insights" },
-  { label: "Morning Brief",       icon: Newspaper,       path: "/analytics"       },
-  { label: "Draft AI",            icon: MessageSquare,   path: "/outreach-crm"    },
-  { label: "Campaign",            icon: Send,            path: "/campaigns"       },
+  { label: "Morning Brief",       icon: Newspaper,       path: "/morning-brief"      },
+  { label: "Draft AI",            icon: MessageSquare,   path: "/draft-ai"           },
+  { label: "Campaign",            icon: Send,            path: "/campaigns"          },
   { label: "Pengaturan",          icon: Settings,        path: "/settings"        },
 ];
 

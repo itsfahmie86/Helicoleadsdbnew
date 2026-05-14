@@ -11,6 +11,9 @@ import { AnalyticsROIPage } from "./components/pages/AnalyticsROIPage";
 import { PricingPage } from "./components/pages/PricingPage";
 import { SettingsPage } from "./components/pages/SettingsPage";
 import { ErrorsDemoPage } from "./components/pages/ErrorsDemoPage";
+import { PainRadarPage } from "./components/pages/PainRadarPage";
+import { MorningBriefPage } from "./components/pages/MorningBriefPage";
+import { DraftAIPage } from "./components/pages/DraftAIPage";
 import { AuthCallbackPage } from "./components/pages/AuthCallbackPage";
 
 // ─── Error Pages ─────────────────────────────────────────────────────────────
@@ -37,6 +40,9 @@ export const router = createBrowserRouter([
       { path: "database-leads",  Component: DatabaseLeadsPage  },
       { path: "ai-intelligence", Component: AIIntelligencePage },
       { path: "campaigns",       Component: CampaignsPage       },
+      { path: "pain-radar",      Component: PainRadarPage       },
+      { path: "morning-brief",   Component: MorningBriefPage    },
+      { path: "draft-ai",        Component: DraftAIPage         },
       { path: "outreach-crm",    Component: OutreachCRMPage    },
       { path: "market-insights", Component: MarketInsightsPage },
       { path: "analytics",       Component: AnalyticsROIPage   },
