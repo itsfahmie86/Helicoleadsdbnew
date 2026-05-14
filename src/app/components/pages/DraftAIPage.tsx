@@ -124,8 +124,8 @@ export function DraftAIPage() {
                     style={{
                       display: "flex", alignItems: "center", gap: 10, padding: "10px 12px",
                       borderRadius: 8, cursor: "pointer", textAlign: "left",
-                      border: selected?.place_id === lead.place_id ? "1px solid #E2E8F0" : "1px solid #E2E8F0",
-                      background: selected?.place_id === lead.place_id ? "#FFFFFF" : "transparent",
+                      border: selected?.place_id === lead.place_id ? "1.5px solid #CBD5E1" : "1px solid #E2E8F0",
+                      background: selected?.place_id === lead.place_id ? "#FFFFFF" : "#F8FAFC",
                     }}>
                     <div style={{
                       width: 32, height: 32, borderRadius: 8, flexShrink: 0,
@@ -140,10 +140,17 @@ export function DraftAIPage() {
                       <p style={{ fontSize: 13, fontWeight: 500, color: "#0F1F3D", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{lead.name}</p>
                       <p style={{ fontSize: 11, color: "#94A3B8" }}>{lead.city} · {lead.niche}</p>
                     </div>
-                    <span style={{
-                      fontSize: 12, fontWeight: 700,
-                      color: lead.lead_score >= 70 ? "#DC2626" : lead.lead_score >= 50 ? "#D97706" : "#2563EB"
-                    }}>{lead.lead_score}</span>
+                    <div style={{ display: "flex", alignItems: "center", gap: 6, flexShrink: 0 }}>
+                      {lead.badge === 'hot' || lead.badge === 'priority' ? (
+                        <span style={{ fontSize: 10, fontWeight: 600, padding: "2px 7px", borderRadius: 20, background: "#FEF2F2", color: "#DC2626", border: "1px solid #FECACA" }}>Hot</span>
+                      ) : lead.badge === 'warm' ? (
+                        <span style={{ fontSize: 10, fontWeight: 600, padding: "2px 7px", borderRadius: 20, background: "#FFFBEB", color: "#D97706", border: "1px solid #FDE68A" }}>Warm</span>
+                      ) : null}
+                      <span style={{
+                        fontSize: 12, fontWeight: 700,
+                        color: lead.lead_score >= 70 ? "#DC2626" : lead.lead_score >= 50 ? "#D97706" : "#2563EB"
+                      }}>{lead.lead_score}</span>
+                    </div>
                     <ChevronRight size={14} style={{ color: "#CBD5E1", flexShrink: 0 }} />
                   </button>
                 ))}
