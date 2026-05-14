@@ -80,7 +80,7 @@ function transformLead(lead: SupabaseLead, index: number) {
     rating: lead.rating || 0,
     reviews: lead.review_count || 0,
     painScore: lead.lead_score || 0,
-    badge: lead.badge === 'priority' ? 'hot' : lead.badge || 'cold',
+    badge: (lead.badge === "priority" || lead.badge === "digital_opportunity") ? "hot" : (lead.badge === "hot" || lead.badge === "warm" || lead.badge === "cold") ? lead.badge : "cold",
     painPoints: [
       lead.primary_pain_category || 'Belum ada data pain points',
       !lead.has_website ? 'Tidak memiliki website' : 'Website tersedia',
