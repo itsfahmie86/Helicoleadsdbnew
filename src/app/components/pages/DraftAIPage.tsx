@@ -27,7 +27,9 @@ export function DraftAIPage() {
       .order("lead_score", { ascending: false })
       .limit(20)
       .then(({ data }) => {
-        setLeads(data || []);
+        const list = data || [];
+        setLeads(list);
+        if (list.length > 0) setSelected(list[0]);
         setLoading(false);
       });
   }, []);
