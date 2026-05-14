@@ -24,7 +24,7 @@ export function PainRadarPage() {
         {leads.length === 0 && (
           <div className="text-center py-20" style={{ color: "#94A3B8" }}>
             <p style={{ fontSize: 14 }}>Belum ada data Pain Radar.</p>
-            <p style={{ fontSize: 12, marginTop: 4 }}>Jalankan Pain Radar Engine di n8n terlebih dahulu.</p>
+            <p style={{ fontSize: 12, marginTop: 4 }}>Data akan diperbarui otomatis setiap hari.</p>
           </div>
         )}
         {(leads as any[]).map((lead, i) => {

@@ -5,7 +5,7 @@ export function MorningBriefPage() {
       <p style={{ fontSize: 13, color: "#64748B", marginTop: 4 }}>Laporan harian personal dikirim jam 07.00 WIB</p>
       <div style={{ marginTop: 32, textAlign: "center", color: "#94A3B8" }}>
         <p style={{ fontSize: 14 }}>Brief hari ini belum tersedia.</p>
-        <p style={{ fontSize: 12, marginTop: 4 }}>Aktifkan Morning Intelligence Brief di n8n.</p>
+        <p style={{ fontSize: 12, marginTop: 4 }}>Fitur ini akan aktif otomatis setiap pagi jam 07.00 WIB.</p>
       </div>
     </div>
   );
