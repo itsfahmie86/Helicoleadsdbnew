@@ -84,8 +84,8 @@ export function DraftAIPage() {
                 <button key={m.key} onClick={() => setMode(m.key)}
                   style={{
                     padding: "10px 12px", borderRadius: 8, textAlign: "left", cursor: "pointer",
-                    border: mode === m.key ? "1.5px solid #4F46E5" : "1px solid #E2E8F0",
-                    background: mode === m.key ? "#EEF2FF" : "#FFFFFF",
+                    border: mode === m.key ? "1px solid #E2E8F0" : "1px solid #E2E8F0",
+                    background: mode === m.key ? "#FFFFFF" : "transparent",
                   }}>
                   <p style={{ fontSize: 12, fontWeight: 600, color: mode === m.key ? "#4F46E5" : "#0F1F3D" }}>{m.label}</p>
                   <p style={{ fontSize: 11, color: "#94A3B8", marginTop: 2 }}>{m.desc}</p>
