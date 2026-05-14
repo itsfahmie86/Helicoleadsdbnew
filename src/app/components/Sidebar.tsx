@@ -1,6 +1,6 @@
-import { useState } from "react";
-import { NavLink, useNavigate } from "react-router";
-import {
+import { Activity, Newspaper, MessageSquare, Search, useState } from "react";
+import { Activity, Newspaper, MessageSquare, Search, NavLink, useNavigate } from "react-router";
+import { Activity, Newspaper, MessageSquare, Search,
   LayoutDashboard,
   Search,
   Database,
@@ -32,21 +32,15 @@ interface NavItem {
 
 // ─── Nav items — in exact order requested ─────────────────────────────────────
 const navItems: NavItem[] = [
-  { label: "Dashboard",           icon: LayoutDashboard, path: "/"                },
-  { label: "Database Leads Saya", icon: Database,        path: "/database-leads"  },
-  { label: "Inteligensi AI",      icon: Sparkles,        path: "/ai-intelligence" },
-  {
-    label: "Campaigns",
-    icon: Target,
-    path: "/campaigns",
-    badge: "New",
-    featured: true,
-  },
-  { label: "Outreach CRM",        icon: Send,            path: "/outreach-crm"    },
-  { label: "Market Insights",     icon: TrendingUp,      path: "/market-insights" },
-  { label: "Analytics & ROI",     icon: BarChart2,       path: "/analytics"       },
-  { label: "Pricing",             icon: CreditCard,      path: "/pricing"         },
-  { label: "Settings",            icon: Settings,        path: "/settings"        },
+  { label: "Overview",            icon: LayoutDashboard, path: "/"                },
+  { label: "Cari Leads",          icon: Search,          path: "/database-leads"  },
+  { label: "My Leads",            icon: Database,        path: "/ai-intelligence" },
+  { label: "Pain Radar",          icon: Activity,        path: "/campaigns",      },
+  { label: "Market Insight",      icon: TrendingUp,      path: "/market-insights" },
+  { label: "Morning Brief",       icon: Newspaper,       path: "/analytics"       },
+  { label: "Draft AI",            icon: MessageSquare,   path: "/outreach-crm"    },
+  { label: "Campaign",            icon: Send,            path: "/campaigns"       },
+  { label: "Pengaturan",          icon: Settings,        path: "/settings"        },
 ];
 
 const workspaces = ["Sales Team Jakarta", "Marketing Team", "Enterprise Ops"];
@@ -75,10 +69,10 @@ export function Sidebar({ onClose }: { onClose?: () => void }) {
             </div>
             <div>
               <p style={{ color: "#0F1F3D", fontSize: "14px", fontWeight: 700, lineHeight: 1.2 }}>
-                HelicoLeads
+                Pake Data
               </p>
               <p style={{ color: "#8A97A8", fontSize: "11px", fontWeight: 400, lineHeight: 1.2 }}>
-                Lead Intelligence
+                B2B Intelligence
               </p>
             </div>
           </div>
