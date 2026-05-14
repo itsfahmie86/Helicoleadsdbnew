@@ -82,10 +82,10 @@ export function DraftAIPage() {
                 <button key={m.key} onClick={() => setMode(m.key)}
                   style={{
                     padding: "10px 12px", borderRadius: 8, textAlign: "left", cursor: "pointer",
-                    border: mode === m.key ? "1.5px solid #DC2626" : "1px solid #E2E8F0",
-                    background: mode === m.key ? "#FEF2F2" : "#F8FAFC",
+                    border: mode === m.key ? "1px solid #E2E8F0" : "1px solid #E2E8F0",
+                    background: mode === m.key ? "#FFFFFF" : "transparent",
                   }}>
-                  <p style={{ fontSize: 12, fontWeight: 600, color: mode === m.key ? "#DC2626" : "#0F1F3D" }}>{m.label}</p>
+                  <p style={{ fontSize: 12, fontWeight: 600, color: mode === m.key ? "#4F46E5" : "#0F1F3D" }}>{m.label}</p>
                   <p style={{ fontSize: 11, color: "#94A3B8", marginTop: 2 }}>{m.desc}</p>
                 </button>
               ))}
@@ -100,9 +100,9 @@ export function DraftAIPage() {
                 <button key={c} onClick={() => setChannel(c)}
                   style={{
                     padding: "8px 16px", borderRadius: 8, cursor: "pointer", fontSize: 13,
-                    border: channel === c ? "1.5px solid #DC2626" : "1px solid #E2E8F0",
-                    background: channel === c ? "#FEF2F2" : "#F8FAFC",
-                    color: channel === c ? "#DC2626" : "#64748B", fontWeight: channel === c ? 600 : 400,
+                    border: channel === c ? "1px solid #E2E8F0" : "1px solid #E2E8F0",
+                    background: channel === c ? "#FFFFFF" : "transparent",
+                    color: channel === c ? "#4F46E5" : "#64748B", fontWeight: channel === c ? 600 : 400,
                   }}>
                   {c === "whatsapp" ? "WhatsApp" : "Email"}
                 </button>
@@ -124,8 +124,8 @@ export function DraftAIPage() {
                     style={{
                       display: "flex", alignItems: "center", gap: 10, padding: "10px 12px",
                       borderRadius: 8, cursor: "pointer", textAlign: "left",
-                      border: selected?.place_id === lead.place_id ? "1.5px solid #DC2626" : "1px solid #E2E8F0",
-                      background: selected?.place_id === lead.place_id ? "#FEF2F2" : "#F8FAFC",
+                      border: selected?.place_id === lead.place_id ? "1px solid #E2E8F0" : "1px solid #E2E8F0",
+                      background: selected?.place_id === lead.place_id ? "#FFFFFF" : "transparent",
                     }}>
                     <div style={{
                       width: 32, height: 32, borderRadius: 8, flexShrink: 0,
